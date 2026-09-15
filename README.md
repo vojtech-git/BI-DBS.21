@@ -19,3 +19,8 @@ V hospodě je možné si rezervovat pokoj. O pokoji bude v databázi zaznamenán
 ## Diagram
 
 ![Diagram](diagram_white_background.png)
+
+## Relační schéma
+
+![Relational Schema](relational_schema.png)
+
