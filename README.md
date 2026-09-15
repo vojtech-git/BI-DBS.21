@@ -18,4 +18,4 @@ V hospodě je možné si rezervovat pokoj. O pokoji bude v databázi zaznamenán
 
 ## Diagram
 
-![Diagram](diagram.png)
+![Diagram](diagram_white_background.png)
