@@ -15,3 +15,7 @@ K vesmírným kontraktům se budou moci přihlašovat Zaměstnanci. U zaměstnan
 Zákazník bude kdokoliv kdo si koupí nějaké zboží nebo pronajme pokoj.
 
 V hospodě je možné si rezervovat pokoj. O pokoji bude v databázi zaznamenána jeho velikost, počet postelí a zda je v ceně zahrnuta údrzba. Pokoj si může rezervovat jednotlvý zakazník.
+
+## Diagram
+
+![Diagram](diagram.png)
