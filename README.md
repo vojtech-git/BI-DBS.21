@@ -180,17 +180,274 @@ ALTER TABLE kontrakt ADD CONSTRAINT xc_kontrakt_id_ukol_ostatni_id_ CHECK ((id_u
 ### Vsechny osoby, ktere jsou zakaznici a jejich vernostni bonus.
 
 Kategorie:
-A - Pozitivní dotaz nad spojením alespoň dvou tabulek
-F2 - NATURAL JOIN|JOIN USING 
+A F2
 
 #### RA
 
+```
 {osoba[osoba.id_osoba = zakaznik.id_osoba]zakaznik}
 [id_osoba, jmeno, vernostni_bonus]
+```
 
 #### SQL
 
+```
 SELECT osoba.*, zakaznik.vernostni_bonus
 FROM osoba
 JOIN zakaznik USING (id_osoba)
 ;
+```
+
+### Vypis vsechny atributy osob, ktere nejsou zamestnanci. 
+
+Kategorie:
+B G1
+
+#### RA
+
+```
+osoba!<*zamestnanec
+```
+
+#### SQL
+
+```
+select osoba.*
+from osoba
+where id_osoba not in (
+    select id_osoba
+    from zamestnanec
+)
+;
+```
+
+### Pokoj na kterem spi pouze zakaznik "Kathy Sherratt". 
+
+Kategorie:
+C F1 F2 G2 H2
+
+#### RA
+
+```
+{pokoj<*{zakaznik[zakaznik.id_osoba = osoba.id_osoba]osoba(jmeno='Kathy Sherratt')}}
+\
+{pokoj<*{zakaznik[zakaznik.id_osoba = osoba.id_osoba]osoba(jmeno!='Kathy Sherratt')}}
+```
+
+#### SQL
+
+```
+select distinct id_pokoj, pocet_postel
+from pokoj
+natural join (
+    select distinct zakaznik.id_osoba, zakaznik.id_pokoj, zakaznik.vernostni_bonus, r1.id_osoba as id_osoba_1, r1.jmeno
+    from zakaznik
+    join (
+        select distinct *
+        from osoba
+        where jmeno = 'Kathy Sherratt'
+    ) r1 on zakaznik.id_osoba = r1.id_osoba
+) r2
+except
+select distinct id_pokoj, pocet_postel
+from pokoj pokoj1
+natural join (
+    select distinct zakaznik1.id_osoba, zakaznik1.id_pokoj, zakaznik1.vernostni_bonus, r3.id_osoba as id_osoba_1, r3.jmeno
+    from zakaznik zakaznik1
+    join (
+        select distinct *
+        from osoba osoba1
+        where jmeno != 'Kathy Sherratt'
+    ) r3 on zakaznik1.id_osoba = r3.id_osoba
+) r4;
+```
+
+### Zbozi, ktere si koupili vsichni zakaznici.
+
+Kategorie:
+D1 G1 G4
+
+#### RA
+
+```
+zbozi_vsechno:=zbozi[id_zbozi]
+zakaznici:=zakaznik[id_osoba]
+vsechny_kombinace:=zbozi_vsechno×zakaznici
+realne_kombinace:=prodej[id_zbozi, id_osoba]
+nenastale_kombinace:=vsechny_kombinace\realne_kombinace
+zbozi_ktere_neprodalo_vsem:=nenastale_kombinace[id_zbozi]
+zbozi_ktere_prodalo_vsem:=zbozi[id_zbozi]\zbozi_ktere_neprodalo_vsem
+zbozi_ktere_prodalo_vsem*zbozi
+```
+
+#### SQL
+
+```
+select *
+from zbozi z where not exists(
+    select *
+    from zakaznik o
+    where not exists(
+        select z
+        from prodej p
+        where o.id_osoba = p.id_osoba and z.id_zbozi = p.id_zbozi
+    )
+)
+```
+
+### Kontrola dotazu: Zbozi, ktere si koupili vsichni zakaznici.
+
+Kategorie:
+D2 F2 G1 G4 H2
+
+#### SQL
+
+```
+select *
+from zakaznik
+
+except
+
+select o.*
+from zakaznik o
+join prodej p using(id_osoba)
+where id_zbozi = (
+    select id_zbozi
+    from zbozi z where not exists(
+        select *
+        from zakaznik o
+        where not exists(
+            select z
+            from prodej p
+            where o.id_osoba = p.id_osoba and z.id_zbozi = p.id_zbozi
+        )
+    )
+)
+;
+```
+
+### Vytvor pohled obsazenych pokoju na kterych bydli verni zakaznici. 
+
+Kategorie:
+G1 G4 L
+
+#### SQL
+
+```
+create or replace view pokoje as
+select * from pokoj p
+where p.pocet_postel > 2
+and exists (
+  select * from zakaznik z
+  where z.id_pokoj = p.id_pokoj and z.vernostni_bonus > 3
+);
+
+select * from pokoje;
+```
+
+### Vytvor pohled obsazenych pokoju na kterych bydli verni zakaznici a z nich vyber pokoje ktere maji pocet posteli vetsi jak 9.
+
+Kategorie:
+G1 G4 L M
+
+#### SQL
+
+```
+create or replace view pokoje as
+select * from pokoj p
+where p.pocet_postel > 2
+and exists (
+  select * from zakaznik z
+  where z.id_pokoj = p.id_pokoj and z.vernostni_bonus > 3
+);
+
+select * from pokoje
+where pocet_postel > 9;
+```
+
+### Smaz osoby ktere nejsou zakaznici ani zamestnanci. 
+
+Kategorie:
+G1 H1 P
+
+#### SQL
+
+```
+begin;
+
+select * from osoba;
+
+delete from osoba where id_osoba not in (
+  select a.id_osoba from zakaznik a
+  union
+  select z.id_osoba from zamestnanec z
+);
+
+select * from osoba;
+
+rollback;
+```
+
+### Pro kazdy typ nakladu spocitej kolik se odvezlo kg. Zajima nas pouze naklad odvezeny z mesta Bajiao a jen ty typy kterych se dohromady odvezlo vice jak 2000kg. Vysledek serad podle velikosti celkoveho odvezeneho nakladu. 
+
+Kategorie:
+I1 I2 K
+
+#### SQL
+
+```
+select typ_naklad, sum(hmotnost_naklad) as celkove_odvezeno_kg
+from prevoz_zbozi
+where odkud='Bajiao'
+group by typ_naklad
+having sum(hmotnost_naklad)>2000
+order by celkove_odvezeno_kg desc
+```
+
+### Najdi vsechny zamestnance, kteri jsou zaroven zakaznici a vypis i ty co nejsou zakaznici. 
+
+Kategorie:
+A F2 F4
+
+#### SQL
+
+```
+select *
+from zamestnanec
+left join zakaznik using(id_osoba)
+```
+
+## Kategorie dotazů
+
+A 	A - Positive query on at least two joined tables 	D1 D10 D11 D12 D13 D16 D20 D22 D23 D24 D25
+AR 	A (RA) - Positive query on at least two joined tables 	D1 D20 D22 D23 D24 D25
+B 	B - Negative query on at least two joined tables 	D2
+C 	C - Select only those related to... 	D3
+D1 	D1 - Select all related to - universal quantification query 	D4
+D2 	D2 - Result check of D1 query 	D5
+F1 	F1 - JOIN ON 	D3 D20 D24 D25
+F2  F2 - NATURAL JOIN|JOIN USING 	D1 D3 D5 D10 D11 D12 D13 D16 D22 D23
+F2_R  F2 (RA) - NATURAL JOIN|JOIN USING 	D1 D3 D22 D23
+F3 	F3 - CROSS JOIN 	D14
+F4 	F4 - LEFT|RIGHT OUTER JOIN 	D10
+F5 	F5 - FULL (OUTER) JOIN 	D11
+G1 	G1 - Nested query in WHERE clause 	D2 D4 D5 D6 D7 D8 D15 D16 D17 D18 D19 D21
+G1_R  G1 (RA) - Nested query in WHERE clause 	D2 D4 D21
+G2 	G2 - Nested query in FROM clause 	D3 D13
+G2R  G2 (RA) - Nested query in FROM clause 	D3
+G3 	G3 - Nested query in SELECT clause 	D12
+G4 	G4 - Correlated nested query (EXISTS|NOT EXISTS) 	D4 D5 D6 D7 D16 D21
+G4R  G4 (RA) - Correlated nested query (EXISTS|NOT EXISTS) 	D4 D21
+H1 	H1 - Set unification - UNION 	D8 D18
+H2 	H2 - Set difference - MINUS or EXCEPT 	D3 D5 D16
+H2R  H2 (RA) - Set difference - MINUS or EXCEPT 	D3
+H3  H3 - Set intersection - INTERSECT 	D15
+I1 	I1 - Aggregate functions (count|sum|min|max|avg) 	D9 D12 D14 D18
+I2 	I2 - Aggregate function over grouped rows - GROUP BY (HAVING) 	D9
+J 	J - Same query in 3 different sql statements 	D16
+K 	K - All clauses in one query - SELECT FROM WHERE GROUP BY HAVING ORDER BY 	D9
+L 	L - View 	D6 D7
+M 	M - Query over a view 	D7
+N 	N - INSERT, which insert a set of rows, which are the result of another subquery (an INSERT command which has VALUES clause replaced by a nested query. 	D18
+O 	O - UPDATE with nested SELECT statement 	D17
+P 	P - DELETE with nested SELECT statement 
