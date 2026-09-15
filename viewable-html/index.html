@@ -1,0 +1,612 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>BI-DBS.21 - Vojtěch Pejsar (pejsavo3) </title>
+    <link rel="stylesheet" type="text/css" href="./sproject_html.css"/>
+  </head>
+  <body>
+    <script type="text/javascript">
+var display=0;
+function noComment(){
+var comments=document.getElementsByName("comment");
+if(display==1){
+	set_to='block';
+	display=0;
+}
+else{
+	set_to='none';
+	display=1;
+};
+for (i in comments){
+	el=comments[i].style; 
+	el.display=set_to;
+}
+return false;
+}
+</script>
+    <input type="button" value=" Vypnout / zapnout zobrazeni komentaru" onClick="return noComment();"/>
+    <h3 class="course">BI-DBS.21 -            Databázové systémy,            B222</h3>
+    <h3 class="author">Vojtěch Pejsar ( pejsavo3 )          Friday 7:30, Even week, paralelka 1245091876705</h3>
+    <h4 class="author">
+      <a href="&#10;&#9;&#9;&#9;mailto:pejsavo3@fit.cvut.cz">pejsavo3@fit.cvut.cz</a>
+    </h4>
+    <p class="declaration">I declare that I have developed my semestral work independently. All the sources I used are listed in the section References.</p>
+    <h1>Lazarova hospoda</h1>
+    <h2>Description</h2>
+    <p>V dobrodružném vesmíru počítačové hry Lazarovi Parťáci žije Lazar princ J-Manovy říše. Po životě plném hrdinských činů se rozhodl že svá zlatá léta hodlá dožít v klidu. Proto si ve vysokém věku 31 let otevřel svou vesmírnou hospůdku. Pro spravný chod bude potřebovat  vymakanou databazi.</p>
+    <p/>
+    <p>Jelikož se hodlá věnovat i prodeji a směně unikátního **Zboží** a vzácnosti bude muset zaznamenávat co vlastni a chce **prodat**.  Bude pro něj duležité hlavně za kolik, komu a kdy předmět prodal. </p>
+    <p/>
+    <p>Lazar se ve svém volném čase také rád zabýva organizovaním **vesmírných kontraktů** proto je potřeba zaznamenávat kontrakty které mužou plnit pracovnici na volne noze. Jednotlivé vesmírné kontrakty budou detailně rezepsany do nejmenších podrobností aby se pracovníci mohli informovaně rozhodnout zda ukol přijmou, jestli je k splnění potřeba vybavení případně zda ukol vyzaduje tým pracovníků. Kontrakt bude obsahovat informaci o výši odměny a bude označený podle stavu. V kontraktu bude zaznamenáno zda byl úspěšně dokončen.</p>
+    <p/>
+    <p>Vesmírný kontrakt bude vždy mezi Lazarem a jednotlivými zaměstnanci a musí se týkat právě jednoho úkolu na kterém může zaměstnanec pracovat sám a nebo může spolupracovat s dalšími zaměstnanci. Lazarova hospoda nabízí dva standardní typy úkolu **najdi a zneškodno** nebo **převoz zboží**. Pokud úkol nelze zařadit do standardní kategorie je zařazen do kategorie **ostatní**. Jednotlivé úkoly budou obsahovat již zmíněné specifikace a budou vystaveny na tabuli úkolů v hospodě tak aby každý mohl zvážit zda jej chce plnit.</p>
+    <p/>
+    <p>K vesmírným kontraktům se budou moci přihlašovat **Zaměstnanci**. U zaměstnance budou podstatné jeho osobní informace (jméno, příjmení, osobní identifikator obcana J-Manovy Říše (OIOJR) a počet splněných úkolů) a podle jejich počtu splněných prací se bude rozhodovat o bonusech.</p>
+    <p/>
+    <p>**Zákazník** bude kdokoliv kdo si koupí nějaké zboží nebo pronajme pokoj.</p>
+    <p/>
+    <p>V hospodě je možné si rezervovat **pokoj**. O pokoji bude v databázi zaznamenána jeho velikost, počet postelí a zda je v ceně zahrnuta údrzba. Pokoj si může rezervovat jednotlvý zakazník.</p>
+    <h2>Conceptual schema</h2>
+    <img src="conceptual_schema.png" alt="&#10;&#9;&#9;&#9;Zde m&#xE1; b&#xFD;t obr&#xE1;zek va&#x161;eho konceptu&#xE1;ln&#xED;ho modelu.&#10;               "/>
+    <p>Schema neobsahuje smyčky.</p>
+    <h2>Relational schema</h2>
+    <img src="relational_schema.png" alt="&#10;&#9;&#9;&#9;Zde m&#xE1; b&#xFD;t obr&#xE1;zek va&#x161;eho rela&#x10D;n&#xED;ho modelu.&#10;               "/>
+    <h2>Queries</h2>
+    <ol>
+      <li>
+        <p> Kód dotazu: <b><a name="D11">D11</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vsechny osoby, ktere jsou zakaznici a jejich vernostni bonus.</p>
+        <p class="ra">{osoba[osoba.id_osoba = zakaznik.id_osoba]zakaznik}
+[id_osoba, jmeno, vernostni_bonus]</p>
+        <p class="sql">SELECT osoba.*, zakaznik.vernostni_bonus
+FROM osoba
+JOIN zakaznik USING (id_osoba)
+;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D12">D12</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vypis vsechny atributy osob, ktere nejsou zamestnanci.</p>
+        <p class="ra">osoba!&lt;*zamestnanec</p>
+        <p class="sql">select osoba.*
+from osoba
+where id_osoba not in (
+    select id_osoba
+    from zamestnanec
+)
+;
+</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D13">D13</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Pokoj na kterem spi pouze zakaznik "Kathy Sherratt".</p>
+        <p class="ra">{pokoj&lt;*{zakaznik[zakaznik.id_osoba = osoba.id_osoba]osoba(jmeno='Kathy Sherratt')}}
+\
+{pokoj&lt;*{zakaznik[zakaznik.id_osoba = osoba.id_osoba]osoba(jmeno!='Kathy Sherratt')}}
+</p>
+        <p class="sql">select distinct id_pokoj, pocet_postel
+from pokoj
+natural join (
+    select distinct zakaznik.id_osoba, zakaznik.id_pokoj, zakaznik.vernostni_bonus, r1.id_osoba as id_osoba_1, r1.jmeno
+    from zakaznik
+    join (
+        select distinct *
+        from osoba
+        where jmeno = 'Kathy Sherratt'
+    ) r1 on zakaznik.id_osoba = r1.id_osoba
+) r2
+except
+select distinct id_pokoj, pocet_postel
+from pokoj pokoj1
+natural join (
+    select distinct zakaznik1.id_osoba, zakaznik1.id_pokoj, zakaznik1.vernostni_bonus, r3.id_osoba as id_osoba_1, r3.jmeno
+    from zakaznik zakaznik1
+    join (
+        select distinct *
+        from osoba osoba1
+        where jmeno != 'Kathy Sherratt'
+    ) r3 on zakaznik1.id_osoba = r3.id_osoba
+) r4;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D14">D14</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Zbozi, ktere si koupili vsichni zakaznici.</p>
+        <p class="ra">zbozi_vsechno:=zbozi[id_zbozi]
+zakaznici:=zakaznik[id_osoba]
+vsechny_kombinace:=zbozi_vsechno×zakaznici
+realne_kombinace:=prodej[id_zbozi, id_osoba]
+nenastale_kombinace:=vsechny_kombinace\realne_kombinace
+zbozi_ktere_neprodalo_vsem:=nenastale_kombinace[id_zbozi]
+zbozi_ktere_prodalo_vsem:=zbozi[id_zbozi]\zbozi_ktere_neprodalo_vsem
+zbozi_ktere_prodalo_vsem*zbozi</p>
+        <p class="sql">select *
+from zbozi z where not exists(
+    select *
+    from zakaznik o
+    where not exists(
+        select z
+        from prodej p
+        where o.id_osoba = p.id_osoba and z.id_zbozi = p.id_zbozi
+    )
+)</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D15">D15</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Kontrola dotazu D4.</p>
+        <p class="sql">select *
+from zakaznik
+
+except
+
+select o.*
+from zakaznik o
+join prodej p using(id_osoba)
+where id_zbozi = (
+    select id_zbozi
+    from zbozi z where not exists(
+        select *
+        from zakaznik o
+        where not exists(
+            select z
+            from prodej p
+            where o.id_osoba = p.id_osoba and z.id_zbozi = p.id_zbozi
+        )
+    )
+)
+;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D16">D16</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vytvor pohled obsazenych pokoju na kterych bydli verni zakaznici.</p>
+        <p class="sql">create or replace view pokoje as
+select * from pokoj p
+where p.pocet_postel &gt; 2
+and exists (
+  select * from zakaznik z
+  where z.id_pokoj = p.id_pokoj and z.vernostni_bonus &gt; 3
+);
+
+select * from pokoje;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D17">D17</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vytvor pohled obsazenych pokoju na kterych bydli verni zakaznici a z nich vyber pokoje ktere maji pocet posteli vetsi jak 9.</p>
+        <p class="sql">create or replace view pokoje as
+select * from pokoj p
+where p.pocet_postel &gt; 2
+and exists (
+  select * from zakaznik z
+  where z.id_pokoj = p.id_pokoj and z.vernostni_bonus &gt; 3
+);
+
+select * from pokoje
+where pocet_postel &gt; 9;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D18">D18</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Smaz osoby ktere nejsou zakaznici ani zamestnanci.</p>
+        <p class="sql">begin;
+
+select * from osoba;
+
+delete from osoba where id_osoba not in (
+  select a.id_osoba from zakaznik a
+  union
+  select z.id_osoba from zamestnanec z
+);
+
+select * from osoba;
+
+rollback;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D20">D20</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Pro kazdy typ nakladu spocitej kolik se odvezlo kg. Zajima nas pouze naklad odvezeny z mesta Bajiao a jen ty typy kterych se dohromady odvezlo vice jak 2000kg. Vysledek serad podle velikosti celkoveho odvezeneho nakladu.</p>
+        <p class="sql">select typ_naklad, sum(hmotnost_naklad) as celkove_odvezeno_kg
+from prevoz_zbozi
+where odkud='Bajiao'
+group by typ_naklad
+having sum(hmotnost_naklad)&gt;2000
+order by celkove_odvezeno_kg desc</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D21">D21</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Najdi vsechny zamestnance, kteri jsou zaroven zakaznici a vypis i ty co nejsou zakaznici.</p>
+        <p class="sql">select *
+from zamestnanec
+left join zakaznik using(id_osoba)
+</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D22">D22</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vsichni zakaznici, kteri jsou zaroven zamestnanci.</p>
+        <p class="sql">select *
+from zakaznik
+full join zamestnanec using(id_osoba)</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D23">D23</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Spocitej kolik kontraktu plni nebo splnil kazdy zamestnanec.</p>
+        <p class="sql">select o.jmeno, (select count(*) from kontrakt k where k.id_osoba = z.id_osoba) as pocet_kontraktu
+from zamestnanec z
+join osoba o using(id_osoba);</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D24">D24</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Najdi osoby ktere jsou zamestnanci a vypis ktere plni kontrakty a jakou odmenu dostanou.</p>
+        <p class="sql">select o.jmeno, g.id_kontrakt, g.odmena
+from (
+    select k.id_kontrakt, k.odmena, z.id_osoba from kontrakt k
+    join zamestnanec z using(id_osoba)
+) as g
+join osoba o using(id_osoba)</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D25">D25</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Kolik by probehlo nakupu pokud by si kazdy zamestnanec koupil od kazdeho druhu zbozi alespon 1 kus.</p>
+        <p class="sql">select count(*) as pocet_nakupu
+from zbozi
+cross join zakaznik;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D26">D26</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Osoby co nemaji zadny kontrakt a nebydli na zadnem pokoji.</p>
+        <p class="sql">select id_osoba
+from zamestnanec
+where id_osoba not in(
+    select id_osoba
+    from kontrakt
+)
+intersect
+select id_osoba
+from zakaznik
+where id_pokoj is null</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D27">D27</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Zamestnanci kteri nemaji zadne kontrakty</p>
+        <p class="sql">select id_osoba
+from zamestnanec
+where id_osoba not in(
+    select id_osoba
+    from kontrakt
+);
+
+select id_osoba
+from zamestnanec z
+where not exists(
+    select 3
+    from kontrakt k
+    where k.id_osoba = z.id_osoba
+);
+
+select id_osoba
+from zamestnanec
+except
+select id_osoba from zamestnanec join kontrakt using(id_osoba);</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D28">D28</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Zmen popis zamestnance s popisem 'Pre-emptive foreground hardware' na popis 'neco' pokud ma tento zamestnanec alespon jeden uspesne splneny kontrakt.</p>
+        <p class="sql">begin;
+
+select *
+from zamestnanec
+where popis='Pre-emptive foreground hardware';
+
+update zamestnanec
+set popis = 'neco'
+where popis = 'Pre-emptive foreground hardware'
+and id_osoba in (
+select id_osoba
+from kontrakt
+where uspesne_splneno = 'true'
+);
+
+select *
+from zamestnanec
+where popis='neco';
+
+rollback;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D29">D29</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vyber osoby ktere nejsou ani zakaznik ani zamestnanec a pridej je do zakazniku.</p>
+        <p class="sql">begin;
+
+select count(*)
+from osoba
+where id_osoba not in(
+    select id_osoba
+    from zamestnanec
+    union
+    select id_osoba
+    from zakaznik
+);
+
+insert into zakaznik(id_osoba, id_pokoj, vernostni_bonus)
+select id_osoba, null as id_pokoj, 0 as vernostni_bonus
+from osoba
+where id_osoba not in(
+    select id_osoba
+    from zamestnanec
+    union
+    select id_osoba
+    from zakaznik
+);
+
+select count(*)
+from osoba
+where id_osoba not in(
+    select id_osoba
+    from zamestnanec
+    union
+    select id_osoba
+    from zakaznik
+);
+
+rollback;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D30">D30</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vypis vsechny kontrakty ktere se vazou na typ ukolu prevoz_zbozi a plni je nebo je splnil zamestnanec ktery je starsi nez 20 let.</p>
+        <p class="sql">select *
+from kontrakt
+where prevoz_zbozi_id_ukol is not null and id_osoba in(
+    select id_osoba
+    from zamestnanec z
+    where z.vek &gt; 20
+)
+;</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D31">D31</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vypis vsechny nakupy ktere probehly pred 18.3.2035 a zaroven vypis jmeno toho kdo nakupoval.</p>
+        <p class="ra">prodej(datum&gt;'18.3.2077')[prodej.id_osoba = osoba.id_osoba]osoba</p>
+        <p class="sql">SELECT *
+FROM prodej
+JOIN osoba ON prodej.id_osoba = osoba.id_osoba
+WHERE datum &gt; '2077-03-18';</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D32">D32</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Ukol typu ostatni ktery nikdo neplni.</p>
+        <p class="ra">ostatni!&lt;ostatni.id_ukol=kontrakt.ostatni_id_ukol]kontrakt</p>
+        <p class="sql">select distinct *
+from ostatni o
+where not exists(
+    select *
+    from kontrakt
+    where o.id_ukol = kontrakt.ostatni_id_ukol
+)</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D33">D33</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Zbozi ktere si koupil osoba "Vojtech".</p>
+        <p class="ra">osoba(jmeno='Vojtech')[osoba.id_osoba=prodej.id_osoba]prodej[prodej.id_zbozi = zbozi.id_zbozi&gt;zbozi</p>
+        <p class="sql">select z.*
+from zbozi z
+join prodej using(id_zbozi)
+join osoba using(id_osoba)
+where jmeno='Vojtech'</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D34">D34</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vsichni zakaznici kteri si rezervuji pokoj.</p>
+        <p class="ra">{zakaznik[zakaznik.id_pokoj = pokoj.id_pokoj]pokoj}[zakaznik.id_pokoj ,zakaznik.id_osoba, zakaznik.vernostni_bonus, pokoj.pocet_postel]</p>
+        <p class="sql">select *
+from zakaznik
+join pokoj using(id_pokoj)</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D35">D35</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vsechny osoby ktere jsou zakaznici a zamestnanci zaroven.</p>
+        <p class="ra">{zakaznik[zakaznik.id_osoba = zamestnanec.id_osoba]zamestnanec}[zakaznik.id_osoba, zakaznik.vernostni_bonus, zamestnanec.vek, zamestnanec.popis]</p>
+        <p class="sql">select z.id_osoba,
+        z.vernostni_bonus,
+        zm.vek,
+        zm.popis
+from zakaznik z
+join zamestnanec zm on zm.id_osoba = z.id_osoba</p>
+      </li>
+      <li>
+        <p> Kód dotazu: <b><a name="D36">D36</a></b><a href="#tabulka_pokryti"> [Tabulka pokryti kategorií SQL příkazů]</a></p>
+        <p>Vyber vsechny kontrakty ktere jsou spojene s ukolem typu prevoz zbozi a vyber jenom typ nakladu, hmotnost nakladu, odkud a kam.</p>
+        <p class="ra">{kontrakt[kontrakt.prevoz_zbozi_id_ukol = prevoz_zbozi.id_ukol]prevoz_zbozi}[prevoz_zbozi.typ_naklad, prevoz_zbozi.hmotnost_naklad, prevoz_zbozi.odkud, prevoz_zbozi.kam]</p>
+        <p class="sql">select distinct typ_naklad, hmotnost_naklad, odkud, kam
+from kontrakt k
+join prevoz_zbozi pz on k.prevoz_zbozi_id_ukol = pz.id_ukol</p>
+      </li>
+    </ol>
+    <h2>
+      <a name="tabulka_pokryti"> Tabulka pokrytí kategorií SQL příkazů </a>
+    </h2>
+    <table>
+      <tbody>
+        <tr>
+          <th> Kategorie </th>
+          <th> Kódy porývajících dotazů</th>
+          <th> Charekteristika kategorie příkazu</th>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td><a href="#D11">D11</a> <a href="#D21">D21</a> <a href="#D22">D22</a> <a href="#D23">D23</a> <a href="#D24">D24</a> <a href="#D27">D27</a> <a href="#D31">D31</a> <a href="#D33">D33</a> <a href="#D34">D34</a> <a href="#D35">D35</a> <a href="#D36">D36</a> </td>
+          <td>A - Positive query on at least two joined tables</td>
+        </tr>
+        <tr>
+          <td>AR</td>
+          <td><a href="#D11">D11</a> <a href="#D31">D31</a> <a href="#D33">D33</a> <a href="#D34">D34</a> <a href="#D35">D35</a> <a href="#D36">D36</a> </td>
+          <td>A (RA) - Positive query on at least two joined tables</td>
+        </tr>
+        <tr>
+          <td>B</td>
+          <td><a href="#D12">D12</a> </td>
+          <td>B - Negative query on at least two joined tables</td>
+        </tr>
+        <tr>
+          <td>C</td>
+          <td><a href="#D13">D13</a> </td>
+          <td>C - Select only those related to...</td>
+        </tr>
+        <tr>
+          <td>D1</td>
+          <td><a href="#D14">D14</a> </td>
+          <td>D1 - Select all related to - universal quantification query</td>
+        </tr>
+        <tr>
+          <td>D2</td>
+          <td><a href="#D15">D15</a> </td>
+          <td>D2 - Result check of D1 query</td>
+        </tr>
+        <tr>
+          <td>F1</td>
+          <td><a href="#D13">D13</a> <a href="#D31">D31</a> <a href="#D35">D35</a> <a href="#D36">D36</a> </td>
+          <td>F1 - JOIN ON</td>
+        </tr>
+        <tr>
+          <td>F2</td>
+          <td><a href="#D11">D11</a> <a href="#D13">D13</a> <a href="#D15">D15</a> <a href="#D21">D21</a> <a href="#D22">D22</a> <a href="#D23">D23</a> <a href="#D24">D24</a> <a href="#D27">D27</a> <a href="#D33">D33</a> <a href="#D34">D34</a> </td>
+          <td>F2 - NATURAL JOIN|JOIN USING</td>
+        </tr>
+        <tr>
+          <td>F2R</td>
+          <td><a href="#D11">D11</a> <a href="#D13">D13</a> <a href="#D33">D33</a> <a href="#D34">D34</a> </td>
+          <td>F2 (RA) - NATURAL JOIN|JOIN USING</td>
+        </tr>
+        <tr>
+          <td>F3</td>
+          <td><a href="#D25">D25</a> </td>
+          <td>F3 - CROSS JOIN</td>
+        </tr>
+        <tr>
+          <td>F4</td>
+          <td><a href="#D21">D21</a> </td>
+          <td>F4 - LEFT|RIGHT OUTER JOIN</td>
+        </tr>
+        <tr>
+          <td>F5</td>
+          <td><a href="#D22">D22</a> </td>
+          <td>F5 - FULL (OUTER) JOIN</td>
+        </tr>
+        <tr>
+          <td>G1</td>
+          <td><a href="#D12">D12</a> <a href="#D14">D14</a> <a href="#D15">D15</a> <a href="#D16">D16</a> <a href="#D17">D17</a> <a href="#D18">D18</a> <a href="#D26">D26</a> <a href="#D27">D27</a> <a href="#D28">D28</a> <a href="#D29">D29</a> <a href="#D30">D30</a> <a href="#D32">D32</a> </td>
+          <td>G1 - Nested query in WHERE clause</td>
+        </tr>
+        <tr>
+          <td>G1R</td>
+          <td><a href="#D12">D12</a> <a href="#D14">D14</a> <a href="#D32">D32</a> </td>
+          <td>G1 (RA) - Nested query in WHERE clause</td>
+        </tr>
+        <tr>
+          <td>G2</td>
+          <td><a href="#D13">D13</a> <a href="#D24">D24</a> </td>
+          <td>G2 - Nested query in FROM clause</td>
+        </tr>
+        <tr>
+          <td>G2R</td>
+          <td><a href="#D13">D13</a> </td>
+          <td>G2 (RA) - Nested query in FROM clause</td>
+        </tr>
+        <tr>
+          <td>G3</td>
+          <td><a href="#D23">D23</a> </td>
+          <td>G3 - Nested query in SELECT clause</td>
+        </tr>
+        <tr>
+          <td>G4</td>
+          <td><a href="#D14">D14</a> <a href="#D15">D15</a> <a href="#D16">D16</a> <a href="#D17">D17</a> <a href="#D27">D27</a> <a href="#D32">D32</a> </td>
+          <td>G4 - Correlated nested query (EXISTS|NOT EXISTS)</td>
+        </tr>
+        <tr>
+          <td>G4R</td>
+          <td><a href="#D14">D14</a> <a href="#D32">D32</a> </td>
+          <td>G4 (RA) - Correlated nested query (EXISTS|NOT EXISTS)</td>
+        </tr>
+        <tr>
+          <td>H1</td>
+          <td><a href="#D18">D18</a> <a href="#D29">D29</a> </td>
+          <td>H1 - Set unification - UNION</td>
+        </tr>
+        <tr>
+          <td>H2</td>
+          <td><a href="#D13">D13</a> <a href="#D15">D15</a> <a href="#D27">D27</a> </td>
+          <td>H2 - Set difference - MINUS or EXCEPT</td>
+        </tr>
+        <tr>
+          <td>H2R</td>
+          <td><a href="#D13">D13</a> </td>
+          <td>H2 (RA) - Set difference - MINUS or EXCEPT</td>
+        </tr>
+        <tr>
+          <td>H3</td>
+          <td><a href="#D26">D26</a> </td>
+          <td>H3 - Set intersection - INTERSECT</td>
+        </tr>
+        <tr>
+          <td>I1</td>
+          <td><a href="#D20">D20</a> <a href="#D23">D23</a> <a href="#D25">D25</a> <a href="#D29">D29</a> </td>
+          <td>I1 - Aggregate functions (count|sum|min|max|avg)</td>
+        </tr>
+        <tr>
+          <td>I2</td>
+          <td><a href="#D20">D20</a> </td>
+          <td>I2 - Aggregate function over grouped rows - GROUP BY (HAVING)</td>
+        </tr>
+        <tr>
+          <td>J</td>
+          <td><a href="#D27">D27</a> </td>
+          <td>J - Same query in 3 different sql statements</td>
+        </tr>
+        <tr>
+          <td>K</td>
+          <td><a href="#D20">D20</a> </td>
+          <td>K - All clauses in one query - SELECT FROM WHERE GROUP BY HAVING ORDER BY</td>
+        </tr>
+        <tr>
+          <td>L</td>
+          <td><a href="#D16">D16</a> <a href="#D17">D17</a> </td>
+          <td>L - View</td>
+        </tr>
+        <tr>
+          <td>M</td>
+          <td><a href="#D17">D17</a> </td>
+          <td>M - Query over a view</td>
+        </tr>
+        <tr>
+          <td>N</td>
+          <td><a href="#D29">D29</a> </td>
+          <td>N - INSERT, which insert a set of rows, which are the result of another subquery (an INSERT command which has VALUES clause replaced by a nested query.</td>
+        </tr>
+        <tr>
+          <td>O</td>
+          <td><a href="#D28">D28</a> </td>
+          <td>O - UPDATE with nested SELECT statement</td>
+        </tr>
+        <tr>
+          <td>P</td>
+          <td><a href="#D18">D18</a> </td>
+          <td>P - DELETE with nested SELECT statement</td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Scripts</h2>
+    <p>
+                <a href="./create.sql">create.sql</a>
+            </p>
+    <p>
+                <a href="./insert.sql">insert.sql</a>
+            </p>
+    <h2>Conclusion</h2>
+    <p>Na semestralni praci jsem rozhodne nestravil dost casu. Prace mne bavila a jsem si jisty ze chci v podobnem studiu pokracovat. SQL a relacni agebra jsou velmi zajimava temata. Videa ke kazde kategorii dotazu mi velmi pomohla. Odnesl jsem si ze slozene klice nejsou vzdy nejlepsi napad a obcas komplikuji dotazovani nad databazi. Ocenuji ze je k predmetu vytvoren samostatny portal ktery funguje tak dobre jak funguje. Prace v nem je velmi plynula ale ocenil u dotazu bych rad mel tlacitko ulozit vse najednou. A prite nebudu nechavat vse na posledni chvili. Dekuji za trpelivost pri kotrole.</p>
+    <h2>References</h2>
+    <p>[1] Stránky předmětu DBS.BI-DBS FIT ČVUT Course Pages [online]. FIT ČVUT, 2023, [cit.16.5.2023]. Dostupné z: https://courses.fit.cvut.cz</p>
+    <p/>
+    <p/>
+    <p>[2] QUAST, Karel: .Vzorová semestrální práce [online]. FIT ČVUT, 2023, [cit.16.5.2023]. Dostupné z: https://users.fit.cvut.cz/~hunkajir/dbs/main.xml</p>
+    <p/>
+    <p/>
+    <p>[3] Mockaroo Random Data Generator and API Mocking Tool. | JSON / CSV / SQL / Excel [online]. Mockaroo, 2023, [cit. 16.5.2023]. Dostupné z: https://www.mockaroo.com/</p>
+    <p/>
+    <p/>
+  </body>
+</html>

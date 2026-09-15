@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="./sproject_html.xsl"?>
+<!DOCTYPE sproject SYSTEM "sproject.dtd">
+<sproject>
+    <course database="Oracle" version="11">
+        <cname>Databázové systémy</cname>
+            <code>BI-DBS.21</code>
+            <semester>B222</semester>
+            <seminar>Friday 7:30, Even week, paralelka 1245091876705</seminar>
+    </course>
+        <author>
+            <aname>Vojtěch Pejsar</aname>
+            <uname>pejsavo3</uname>
+            <email>pejsavo3@fit.cvut.cz</email>
+        </author>
+    <content>
+        <declaration>I declare that I have developed my semestral work independently. All the sources I used are listed in the section References.</declaration>
+            <title>Lazarova hospoda</title>
+        <description>
+            <title>Description</title>
+                    <para>V dobrodružném vesmíru počítačové hry Lazarovi Parťáci žije Lazar princ J-Manovy říše. Po životě plném hrdinských činů se rozhodl že svá zlatá léta hodlá dožít v klidu. Proto si ve vysokém věku 31 let otevřel svou vesmírnou hospůdku. Pro spravný chod bude potřebovat  vymakanou databazi.</para>
+                    <para></para>
+                    <para>Jelikož se hodlá věnovat i prodeji a směně unikátního **Zboží** a vzácnosti bude muset zaznamenávat co vlastni a chce **prodat**.  Bude pro něj duležité hlavně za kolik, komu a kdy předmět prodal. </para>
+                    <para></para>
+                    <para>Lazar se ve svém volném čase také rád zabýva organizovaním **vesmírných kontraktů** proto je potřeba zaznamenávat kontrakty které mužou plnit pracovnici na volne noze. Jednotlivé vesmírné kontrakty budou detailně rezepsany do nejmenších podrobností aby se pracovníci mohli informovaně rozhodnout zda ukol přijmou, jestli je k splnění potřeba vybavení případně zda ukol vyzaduje tým pracovníků. Kontrakt bude obsahovat informaci o výši odměny a bude označený podle stavu. V kontraktu bude zaznamenáno zda byl úspěšně dokončen.</para>
+                    <para></para>
+                    <para>Vesmírný kontrakt bude vždy mezi Lazarem a jednotlivými zaměstnanci a musí se týkat právě jednoho úkolu na kterém může zaměstnanec pracovat sám a nebo může spolupracovat s dalšími zaměstnanci. Lazarova hospoda nabízí dva standardní typy úkolu **najdi a zneškodno** nebo **převoz zboží**. Pokud úkol nelze zařadit do standardní kategorie je zařazen do kategorie **ostatní**. Jednotlivé úkoly budou obsahovat již zmíněné specifikace a budou vystaveny na tabuli úkolů v hospodě tak aby každý mohl zvážit zda jej chce plnit.</para>
+                    <para></para>
+                    <para>K vesmírným kontraktům se budou moci přihlašovat **Zaměstnanci**. U zaměstnance budou podstatné jeho osobní informace (jméno, příjmení, osobní identifikator obcana J-Manovy Říše (OIOJR) a počet splněných úkolů) a podle jejich počtu splněných prací se bude rozhodovat o bonusech.</para>
+                    <para></para>
+                    <para>**Zákazník** bude kdokoliv kdo si koupí nějaké zboží nebo pronajme pokoj.</para>
+                    <para></para>
+                    <para>V hospodě je možné si rezervovat **pokoj**. O pokoji bude v databázi zaznamenána jeho velikost, počet postelí a zda je v ceně zahrnuta údrzba. Pokoj si může rezervovat jednotlvý zakazník.</para>
+        </description>
+        <data_model>
+            <title>Conceptual schema</title>
+            <dm_picture>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="conceptual_schema.png"/>
+                    </imageobject>
+                </mediaobject>
+            </dm_picture>
+            <dm_discussion>
+                        <para>Schema neobsahuje smyčky.</para>
+            </dm_discussion>
+        </data_model>
+        <relational_model>
+            <title>Relational schema</title>
+            <rm_picture>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="relational_schema.png"/>
+                    </imageobject>
+                </mediaobject>
+            </rm_picture>
+        </relational_model>
+        <queries>
+            <title>Queries</title>
+            <dotazy>
+                    <dotaz dotaz_id="D11">
+                        <popis_dotazu>
+                                <para>Vsechny osoby, ktere jsou zakaznici a jejich vernostni bonus.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>{osoba[osoba.id_osoba = zakaznik.id_osoba]zakaznik}
+[id_osoba, jmeno, vernostni_bonus]</relacni_algebra>
+                            <sql>SELECT osoba.*, zakaznik.vernostni_bonus
+FROM osoba
+JOIN zakaznik USING (id_osoba)
+;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D12">
+                        <popis_dotazu>
+                                <para>Vypis vsechny atributy osob, ktere nejsou zamestnanci.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>osoba!&lt;*zamestnanec</relacni_algebra>
+                            <sql>select osoba.*
+from osoba
+where id_osoba not in (
+    select id_osoba
+    from zamestnanec
+)
+;
+</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D13">
+                        <popis_dotazu>
+                                <para>Pokoj na kterem spi pouze zakaznik &quot;Kathy Sherratt&quot;.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>{pokoj&lt;*{zakaznik[zakaznik.id_osoba = osoba.id_osoba]osoba(jmeno=&apos;Kathy Sherratt&apos;)}}
+\
+{pokoj&lt;*{zakaznik[zakaznik.id_osoba = osoba.id_osoba]osoba(jmeno!=&apos;Kathy Sherratt&apos;)}}
+</relacni_algebra>
+                            <sql>select distinct id_pokoj, pocet_postel
+from pokoj
+natural join (
+    select distinct zakaznik.id_osoba, zakaznik.id_pokoj, zakaznik.vernostni_bonus, r1.id_osoba as id_osoba_1, r1.jmeno
+    from zakaznik
+    join (
+        select distinct *
+        from osoba
+        where jmeno = &apos;Kathy Sherratt&apos;
+    ) r1 on zakaznik.id_osoba = r1.id_osoba
+) r2
+except
+select distinct id_pokoj, pocet_postel
+from pokoj pokoj1
+natural join (
+    select distinct zakaznik1.id_osoba, zakaznik1.id_pokoj, zakaznik1.vernostni_bonus, r3.id_osoba as id_osoba_1, r3.jmeno
+    from zakaznik zakaznik1
+    join (
+        select distinct *
+        from osoba osoba1
+        where jmeno != &apos;Kathy Sherratt&apos;
+    ) r3 on zakaznik1.id_osoba = r3.id_osoba
+) r4;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D14">
+                        <popis_dotazu>
+                                <para>Zbozi, ktere si koupili vsichni zakaznici.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>zbozi_vsechno:=zbozi[id_zbozi]
+zakaznici:=zakaznik[id_osoba]
+vsechny_kombinace:=zbozi_vsechno×zakaznici
+realne_kombinace:=prodej[id_zbozi, id_osoba]
+nenastale_kombinace:=vsechny_kombinace\realne_kombinace
+zbozi_ktere_neprodalo_vsem:=nenastale_kombinace[id_zbozi]
+zbozi_ktere_prodalo_vsem:=zbozi[id_zbozi]\zbozi_ktere_neprodalo_vsem
+zbozi_ktere_prodalo_vsem*zbozi</relacni_algebra>
+                            <sql>select *
+from zbozi z where not exists(
+    select *
+    from zakaznik o
+    where not exists(
+        select z
+        from prodej p
+        where o.id_osoba = p.id_osoba and z.id_zbozi = p.id_zbozi
+    )
+)</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D15">
+                        <popis_dotazu>
+                                <para>Kontrola dotazu D4.</para>
+                        </popis_dotazu>
+                            <sql>select *
+from zakaznik
+
+except
+
+select o.*
+from zakaznik o
+join prodej p using(id_osoba)
+where id_zbozi = (
+    select id_zbozi
+    from zbozi z where not exists(
+        select *
+        from zakaznik o
+        where not exists(
+            select z
+            from prodej p
+            where o.id_osoba = p.id_osoba and z.id_zbozi = p.id_zbozi
+        )
+    )
+)
+;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D16">
+                        <popis_dotazu>
+                                <para>Vytvor pohled obsazenych pokoju na kterych bydli verni zakaznici.</para>
+                        </popis_dotazu>
+                            <sql>create or replace view pokoje as
+select * from pokoj p
+where p.pocet_postel &gt; 2
+and exists (
+  select * from zakaznik z
+  where z.id_pokoj = p.id_pokoj and z.vernostni_bonus &gt; 3
+);
+
+select * from pokoje;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D17">
+                        <popis_dotazu>
+                                <para>Vytvor pohled obsazenych pokoju na kterych bydli verni zakaznici a z nich vyber pokoje ktere maji pocet posteli vetsi jak 9.</para>
+                        </popis_dotazu>
+                            <sql>create or replace view pokoje as
+select * from pokoj p
+where p.pocet_postel &gt; 2
+and exists (
+  select * from zakaznik z
+  where z.id_pokoj = p.id_pokoj and z.vernostni_bonus &gt; 3
+);
+
+select * from pokoje
+where pocet_postel &gt; 9;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D18">
+                        <popis_dotazu>
+                                <para>Smaz osoby ktere nejsou zakaznici ani zamestnanci.</para>
+                        </popis_dotazu>
+                            <sql>begin;
+
+select * from osoba;
+
+delete from osoba where id_osoba not in (
+  select a.id_osoba from zakaznik a
+  union
+  select z.id_osoba from zamestnanec z
+);
+
+select * from osoba;
+
+rollback;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D20">
+                        <popis_dotazu>
+                                <para>Pro kazdy typ nakladu spocitej kolik se odvezlo kg. Zajima nas pouze naklad odvezeny z mesta Bajiao a jen ty typy kterych se dohromady odvezlo vice jak 2000kg. Vysledek serad podle velikosti celkoveho odvezeneho nakladu.</para>
+                        </popis_dotazu>
+                            <sql>select typ_naklad, sum(hmotnost_naklad) as celkove_odvezeno_kg
+from prevoz_zbozi
+where odkud=&apos;Bajiao&apos;
+group by typ_naklad
+having sum(hmotnost_naklad)&gt;2000
+order by celkove_odvezeno_kg desc</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D21">
+                        <popis_dotazu>
+                                <para>Najdi vsechny zamestnance, kteri jsou zaroven zakaznici a vypis i ty co nejsou zakaznici.</para>
+                        </popis_dotazu>
+                            <sql>select *
+from zamestnanec
+left join zakaznik using(id_osoba)
+</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D22">
+                        <popis_dotazu>
+                                <para>Vsichni zakaznici, kteri jsou zaroven zamestnanci.</para>
+                        </popis_dotazu>
+                            <sql>select *
+from zakaznik
+full join zamestnanec using(id_osoba)</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D23">
+                        <popis_dotazu>
+                                <para>Spocitej kolik kontraktu plni nebo splnil kazdy zamestnanec.</para>
+                        </popis_dotazu>
+                            <sql>select o.jmeno, (select count(*) from kontrakt k where k.id_osoba = z.id_osoba) as pocet_kontraktu
+from zamestnanec z
+join osoba o using(id_osoba);</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D24">
+                        <popis_dotazu>
+                                <para>Najdi osoby ktere jsou zamestnanci a vypis ktere plni kontrakty a jakou odmenu dostanou.</para>
+                        </popis_dotazu>
+                            <sql>select o.jmeno, g.id_kontrakt, g.odmena
+from (
+    select k.id_kontrakt, k.odmena, z.id_osoba from kontrakt k
+    join zamestnanec z using(id_osoba)
+) as g
+join osoba o using(id_osoba)</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D25">
+                        <popis_dotazu>
+                                <para>Kolik by probehlo nakupu pokud by si kazdy zamestnanec koupil od kazdeho druhu zbozi alespon 1 kus.</para>
+                        </popis_dotazu>
+                            <sql>select count(*) as pocet_nakupu
+from zbozi
+cross join zakaznik;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D26">
+                        <popis_dotazu>
+                                <para>Osoby co nemaji zadny kontrakt a nebydli na zadnem pokoji.</para>
+                        </popis_dotazu>
+                            <sql>select id_osoba
+from zamestnanec
+where id_osoba not in(
+    select id_osoba
+    from kontrakt
+)
+intersect
+select id_osoba
+from zakaznik
+where id_pokoj is null</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D27">
+                        <popis_dotazu>
+                                <para>Zamestnanci kteri nemaji zadne kontrakty</para>
+                        </popis_dotazu>
+                            <sql>select id_osoba
+from zamestnanec
+where id_osoba not in(
+    select id_osoba
+    from kontrakt
+);
+
+select id_osoba
+from zamestnanec z
+where not exists(
+    select 3
+    from kontrakt k
+    where k.id_osoba = z.id_osoba
+);
+
+select id_osoba
+from zamestnanec
+except
+select id_osoba from zamestnanec join kontrakt using(id_osoba);</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D28">
+                        <popis_dotazu>
+                                <para>Zmen popis zamestnance s popisem &apos;Pre-emptive foreground hardware&apos; na popis &apos;neco&apos; pokud ma tento zamestnanec alespon jeden uspesne splneny kontrakt.</para>
+                        </popis_dotazu>
+                            <sql>begin;
+
+select *
+from zamestnanec
+where popis=&apos;Pre-emptive foreground hardware&apos;;
+
+update zamestnanec
+set popis = &apos;neco&apos;
+where popis = &apos;Pre-emptive foreground hardware&apos;
+and id_osoba in (
+select id_osoba
+from kontrakt
+where uspesne_splneno = &apos;true&apos;
+);
+
+select *
+from zamestnanec
+where popis=&apos;neco&apos;;
+
+rollback;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D29">
+                        <popis_dotazu>
+                                <para>Vyber osoby ktere nejsou ani zakaznik ani zamestnanec a pridej je do zakazniku.</para>
+                        </popis_dotazu>
+                            <sql>begin;
+
+select count(*)
+from osoba
+where id_osoba not in(
+    select id_osoba
+    from zamestnanec
+    union
+    select id_osoba
+    from zakaznik
+);
+
+insert into zakaznik(id_osoba, id_pokoj, vernostni_bonus)
+select id_osoba, null as id_pokoj, 0 as vernostni_bonus
+from osoba
+where id_osoba not in(
+    select id_osoba
+    from zamestnanec
+    union
+    select id_osoba
+    from zakaznik
+);
+
+select count(*)
+from osoba
+where id_osoba not in(
+    select id_osoba
+    from zamestnanec
+    union
+    select id_osoba
+    from zakaznik
+);
+
+rollback;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D30">
+                        <popis_dotazu>
+                                <para>Vypis vsechny kontrakty ktere se vazou na typ ukolu prevoz_zbozi a plni je nebo je splnil zamestnanec ktery je starsi nez 20 let.</para>
+                        </popis_dotazu>
+                            <sql>select *
+from kontrakt
+where prevoz_zbozi_id_ukol is not null and id_osoba in(
+    select id_osoba
+    from zamestnanec z
+    where z.vek &gt; 20
+)
+;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D31">
+                        <popis_dotazu>
+                                <para>Vypis vsechny nakupy ktere probehly pred 18.3.2035 a zaroven vypis jmeno toho kdo nakupoval.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>prodej(datum&gt;&apos;18.3.2077&apos;)[prodej.id_osoba = osoba.id_osoba]osoba</relacni_algebra>
+                            <sql>SELECT *
+FROM prodej
+JOIN osoba ON prodej.id_osoba = osoba.id_osoba
+WHERE datum &gt; &apos;2077-03-18&apos;;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D32">
+                        <popis_dotazu>
+                                <para>Ukol typu ostatni ktery nikdo neplni.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>ostatni!&lt;ostatni.id_ukol=kontrakt.ostatni_id_ukol]kontrakt</relacni_algebra>
+                            <sql>select distinct *
+from ostatni o
+where not exists(
+    select *
+    from kontrakt
+    where o.id_ukol = kontrakt.ostatni_id_ukol
+)</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D33">
+                        <popis_dotazu>
+                                <para>Zbozi ktere si koupil osoba &quot;Vojtech&quot;.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>osoba(jmeno=&apos;Vojtech&apos;)[osoba.id_osoba=prodej.id_osoba]prodej[prodej.id_zbozi = zbozi.id_zbozi&gt;zbozi</relacni_algebra>
+                            <sql>select z.*
+from zbozi z
+join prodej using(id_zbozi)
+join osoba using(id_osoba)
+where jmeno=&apos;Vojtech&apos;</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D34">
+                        <popis_dotazu>
+                                <para>Vsichni zakaznici kteri si rezervuji pokoj.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>{zakaznik[zakaznik.id_pokoj = pokoj.id_pokoj]pokoj}[zakaznik.id_pokoj ,zakaznik.id_osoba, zakaznik.vernostni_bonus, pokoj.pocet_postel]</relacni_algebra>
+                            <sql>select *
+from zakaznik
+join pokoj using(id_pokoj)</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D35">
+                        <popis_dotazu>
+                                <para>Vsechny osoby ktere jsou zakaznici a zamestnanci zaroven.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>{zakaznik[zakaznik.id_osoba = zamestnanec.id_osoba]zamestnanec}[zakaznik.id_osoba, zakaznik.vernostni_bonus, zamestnanec.vek, zamestnanec.popis]</relacni_algebra>
+                            <sql>select z.id_osoba,
+        z.vernostni_bonus,
+        zm.vek,
+        zm.popis
+from zakaznik z
+join zamestnanec zm on zm.id_osoba = z.id_osoba</sql>
+                    </dotaz>
+                    <dotaz dotaz_id="D36">
+                        <popis_dotazu>
+                                <para>Vyber vsechny kontrakty ktere jsou spojene s ukolem typu prevoz zbozi a vyber jenom typ nakladu, hmotnost nakladu, odkud a kam.</para>
+                        </popis_dotazu>
+                            <relacni_algebra>{kontrakt[kontrakt.prevoz_zbozi_id_ukol = prevoz_zbozi.id_ukol]prevoz_zbozi}[prevoz_zbozi.typ_naklad, prevoz_zbozi.hmotnost_naklad, prevoz_zbozi.odkud, prevoz_zbozi.kam]</relacni_algebra>
+                            <sql>select distinct typ_naklad, hmotnost_naklad, odkud, kam
+from kontrakt k
+join prevoz_zbozi pz on k.prevoz_zbozi_id_ukol = pz.id_ukol</sql>
+                    </dotaz>
+            </dotazy>
+            <pokryti_dotazu>
+                        <radek>
+                            <kategorie>A</kategorie>
+                            <odkazy>
+                                    <link url="#D11">D11</link>
+                                    <link url="#D21">D21</link>
+                                    <link url="#D22">D22</link>
+                                    <link url="#D23">D23</link>
+                                    <link url="#D24">D24</link>
+                                    <link url="#D27">D27</link>
+                                    <link url="#D31">D31</link>
+                                    <link url="#D33">D33</link>
+                                    <link url="#D34">D34</link>
+                                    <link url="#D35">D35</link>
+                                    <link url="#D36">D36</link>
+                            </odkazy>
+                            <kategorie_popis>A - Positive query on at least two joined tables</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>AR</kategorie>
+                            <odkazy>
+                                    <link url="#D11">D11</link>
+                                    <link url="#D31">D31</link>
+                                    <link url="#D33">D33</link>
+                                    <link url="#D34">D34</link>
+                                    <link url="#D35">D35</link>
+                                    <link url="#D36">D36</link>
+                            </odkazy>
+                            <kategorie_popis>A (RA) - Positive query on at least two joined tables</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>B</kategorie>
+                            <odkazy>
+                                    <link url="#D12">D12</link>
+                            </odkazy>
+                            <kategorie_popis>B - Negative query on at least two joined tables</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>C</kategorie>
+                            <odkazy>
+                                    <link url="#D13">D13</link>
+                            </odkazy>
+                            <kategorie_popis>C - Select only those related to...</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>D1</kategorie>
+                            <odkazy>
+                                    <link url="#D14">D14</link>
+                            </odkazy>
+                            <kategorie_popis>D1 - Select all related to - universal quantification query</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>D2</kategorie>
+                            <odkazy>
+                                    <link url="#D15">D15</link>
+                            </odkazy>
+                            <kategorie_popis>D2 - Result check of D1 query</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>F1</kategorie>
+                            <odkazy>
+                                    <link url="#D13">D13</link>
+                                    <link url="#D31">D31</link>
+                                    <link url="#D35">D35</link>
+                                    <link url="#D36">D36</link>
+                            </odkazy>
+                            <kategorie_popis>F1 - JOIN ON</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>F2</kategorie>
+                            <odkazy>
+                                    <link url="#D11">D11</link>
+                                    <link url="#D13">D13</link>
+                                    <link url="#D15">D15</link>
+                                    <link url="#D21">D21</link>
+                                    <link url="#D22">D22</link>
+                                    <link url="#D23">D23</link>
+                                    <link url="#D24">D24</link>
+                                    <link url="#D27">D27</link>
+                                    <link url="#D33">D33</link>
+                                    <link url="#D34">D34</link>
+                            </odkazy>
+                            <kategorie_popis>F2 - NATURAL JOIN|JOIN USING</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>F2R</kategorie>
+                            <odkazy>
+                                    <link url="#D11">D11</link>
+                                    <link url="#D13">D13</link>
+                                    <link url="#D33">D33</link>
+                                    <link url="#D34">D34</link>
+                            </odkazy>
+                            <kategorie_popis>F2 (RA) - NATURAL JOIN|JOIN USING</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>F3</kategorie>
+                            <odkazy>
+                                    <link url="#D25">D25</link>
+                            </odkazy>
+                            <kategorie_popis>F3 - CROSS JOIN</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>F4</kategorie>
+                            <odkazy>
+                                    <link url="#D21">D21</link>
+                            </odkazy>
+                            <kategorie_popis>F4 - LEFT|RIGHT OUTER JOIN</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>F5</kategorie>
+                            <odkazy>
+                                    <link url="#D22">D22</link>
+                            </odkazy>
+                            <kategorie_popis>F5 - FULL (OUTER) JOIN</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>G1</kategorie>
+                            <odkazy>
+                                    <link url="#D12">D12</link>
+                                    <link url="#D14">D14</link>
+                                    <link url="#D15">D15</link>
+                                    <link url="#D16">D16</link>
+                                    <link url="#D17">D17</link>
+                                    <link url="#D18">D18</link>
+                                    <link url="#D26">D26</link>
+                                    <link url="#D27">D27</link>
+                                    <link url="#D28">D28</link>
+                                    <link url="#D29">D29</link>
+                                    <link url="#D30">D30</link>
+                                    <link url="#D32">D32</link>
+                            </odkazy>
+                            <kategorie_popis>G1 - Nested query in WHERE clause</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>G1R</kategorie>
+                            <odkazy>
+                                    <link url="#D12">D12</link>
+                                    <link url="#D14">D14</link>
+                                    <link url="#D32">D32</link>
+                            </odkazy>
+                            <kategorie_popis>G1 (RA) - Nested query in WHERE clause</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>G2</kategorie>
+                            <odkazy>
+                                    <link url="#D13">D13</link>
+                                    <link url="#D24">D24</link>
+                            </odkazy>
+                            <kategorie_popis>G2 - Nested query in FROM clause</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>G2R</kategorie>
+                            <odkazy>
+                                    <link url="#D13">D13</link>
+                            </odkazy>
+                            <kategorie_popis>G2 (RA) - Nested query in FROM clause</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>G3</kategorie>
+                            <odkazy>
+                                    <link url="#D23">D23</link>
+                            </odkazy>
+                            <kategorie_popis>G3 - Nested query in SELECT clause</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>G4</kategorie>
+                            <odkazy>
+                                    <link url="#D14">D14</link>
+                                    <link url="#D15">D15</link>
+                                    <link url="#D16">D16</link>
+                                    <link url="#D17">D17</link>
+                                    <link url="#D27">D27</link>
+                                    <link url="#D32">D32</link>
+                            </odkazy>
+                            <kategorie_popis>G4 - Correlated nested query (EXISTS|NOT EXISTS)</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>G4R</kategorie>
+                            <odkazy>
+                                    <link url="#D14">D14</link>
+                                    <link url="#D32">D32</link>
+                            </odkazy>
+                            <kategorie_popis>G4 (RA) - Correlated nested query (EXISTS|NOT EXISTS)</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>H1</kategorie>
+                            <odkazy>
+                                    <link url="#D18">D18</link>
+                                    <link url="#D29">D29</link>
+                            </odkazy>
+                            <kategorie_popis>H1 - Set unification - UNION</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>H2</kategorie>
+                            <odkazy>
+                                    <link url="#D13">D13</link>
+                                    <link url="#D15">D15</link>
+                                    <link url="#D27">D27</link>
+                            </odkazy>
+                            <kategorie_popis>H2 - Set difference - MINUS or EXCEPT</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>H2R</kategorie>
+                            <odkazy>
+                                    <link url="#D13">D13</link>
+                            </odkazy>
+                            <kategorie_popis>H2 (RA) - Set difference - MINUS or EXCEPT</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>H3</kategorie>
+                            <odkazy>
+                                    <link url="#D26">D26</link>
+                            </odkazy>
+                            <kategorie_popis>H3 - Set intersection - INTERSECT</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>I1</kategorie>
+                            <odkazy>
+                                    <link url="#D20">D20</link>
+                                    <link url="#D23">D23</link>
+                                    <link url="#D25">D25</link>
+                                    <link url="#D29">D29</link>
+                            </odkazy>
+                            <kategorie_popis>I1 - Aggregate functions (count|sum|min|max|avg)</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>I2</kategorie>
+                            <odkazy>
+                                    <link url="#D20">D20</link>
+                            </odkazy>
+                            <kategorie_popis>I2 - Aggregate function over grouped rows - GROUP BY (HAVING)</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>J</kategorie>
+                            <odkazy>
+                                    <link url="#D27">D27</link>
+                            </odkazy>
+                            <kategorie_popis>J - Same query in 3 different sql statements</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>K</kategorie>
+                            <odkazy>
+                                    <link url="#D20">D20</link>
+                            </odkazy>
+                            <kategorie_popis>K - All clauses in one query - SELECT FROM WHERE GROUP BY HAVING ORDER BY</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>L</kategorie>
+                            <odkazy>
+                                    <link url="#D16">D16</link>
+                                    <link url="#D17">D17</link>
+                            </odkazy>
+                            <kategorie_popis>L - View</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>M</kategorie>
+                            <odkazy>
+                                    <link url="#D17">D17</link>
+                            </odkazy>
+                            <kategorie_popis>M - Query over a view</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>N</kategorie>
+                            <odkazy>
+                                    <link url="#D29">D29</link>
+                            </odkazy>
+                            <kategorie_popis>N - INSERT, which insert a set of rows, which are the result of another subquery (an INSERT command which has VALUES clause replaced by a nested query.</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>O</kategorie>
+                            <odkazy>
+                                    <link url="#D28">D28</link>
+                            </odkazy>
+                            <kategorie_popis>O - UPDATE with nested SELECT statement</kategorie_popis>
+                        </radek>
+                        <radek>
+                            <kategorie>P</kategorie>
+                            <odkazy>
+                                    <link url="#D18">D18</link>
+                            </odkazy>
+                            <kategorie_popis>P - DELETE with nested SELECT statement</kategorie_popis>
+                        </radek>
+            </pokryti_dotazu>
+        </queries>
+        <scripts>
+            <title>Scripts</title>
+            <para>
+                <link url="./create.sql">create.sql</link>
+            </para>
+            <para>
+                <link url="./insert.sql">insert.sql</link>
+            </para>
+        </scripts>
+        <conclussions>
+            <title>Conclusion</title>
+                    <para>Na semestralni praci jsem rozhodne nestravil dost casu. Prace mne bavila a jsem si jisty ze chci v podobnem studiu pokracovat. SQL a relacni agebra jsou velmi zajimava temata. Videa ke kazde kategorii dotazu mi velmi pomohla. Odnesl jsem si ze slozene klice nejsou vzdy nejlepsi napad a obcas komplikuji dotazovani nad databazi. Ocenuji ze je k predmetu vytvoren samostatny portal ktery funguje tak dobre jak funguje. Prace v nem je velmi plynula ale ocenil u dotazu bych rad mel tlacitko ulozit vse najednou. A prite nebudu nechavat vse na posledni chvili. Dekuji za trpelivost pri kotrole.</para>
+        </conclussions>
+        <references>
+            <title>References</title>
+                    <para>[1] Stránky předmětu DBS.BI-DBS FIT ČVUT Course Pages [online]. FIT ČVUT, 2023, [cit.16.5.2023]. Dostupné z: https://courses.fit.cvut.cz</para>
+                    <para></para>
+                    <para></para>
+                    <para>[2] QUAST, Karel: .Vzorová semestrální práce [online]. FIT ČVUT, 2023, [cit.16.5.2023]. Dostupné z: https://users.fit.cvut.cz/~hunkajir/dbs/main.xml</para>
+                    <para></para>
+                    <para></para>
+                    <para>[3] Mockaroo Random Data Generator and API Mocking Tool. | JSON / CSV / SQL / Excel [online]. Mockaroo, 2023, [cit. 16.5.2023]. Dostupné z: https://www.mockaroo.com/</para>
+                    <para></para>
+                    <para></para>
+        </references>
+    </content>
+</sproject>
