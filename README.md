@@ -1,5 +1,7 @@
 # Semestrální práce z předmětu Databázové systémy: Lazarova hospoda
 
+![html verze](viewable-html)
+
 ## Popis
 
 V dobrodružném vesmíru počítačové hry Lazarovi Parťáci žije Lazar princ J-Manovy říše. Po životě plném hrdinských činů se rozhodl že svá zlatá léta hodlá dožít v klidu. Proto si ve vysokém věku 31 let otevřel svou vesmírnou hospůdku. Pro spravný chod bude potřebovat vymakanou databazi.
