@@ -764,3 +764,11 @@ N 	N - INSERT, which insert a set of rows, which are the result of another subqu
 O 	O - UPDATE with nested SELECT statement 	D17
 P 	P - DELETE with nested SELECT statement 
 ```
+
+### Zdroje
+
+[1] Stránky předmětu DBS.BI-DBS FIT ČVUT Course Pages [online]. FIT ČVUT, 2023, [cit.16.5.2023]. Dostupné z: https://courses.fit.cvut.cz
+
+[2] QUAST, Karel: .Vzorová semestrální práce [online]. FIT ČVUT, 2023, [cit.16.5.2023]. Dostupné z: https://users.fit.cvut.cz/~hunkajir/dbs/main.xml
+
+[3] Mockaroo Random Data Generator and API Mocking Tool. | JSON / CSV / SQL / Excel [online]. Mockaroo, 2023, [cit. 16.5.2023]. Dostupné z: https://www.mockaroo.com/
