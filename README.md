@@ -417,8 +417,180 @@ from zamestnanec
 left join zakaznik using(id_osoba)
 ```
 
-## Kategorie dotazů
+### Vsichni zakaznici, kteri jsou zaroven zamestnanci. 
 
+Kategorie:
+A F2 F5
+
+#### SQL
+
+```
+select *
+from zakaznik
+full join zamestnanec using(id_osoba)
+```
+
+### Spocitej kolik kontraktu plni nebo splnil kazdy zamestnanec.
+
+Kategorie:
+A F2 G3 I1
+
+#### SQL
+
+```
+select o.jmeno, (select count(*) from kontrakt k where k.id_osoba = z.id_osoba) as pocet_kontraktu
+from zamestnanec z
+join osoba o using(id_osoba);
+```
+
+### Najdi osoby ktere jsou zamestnanci a vypis ktere plni kontrakty a jakou odmenu dostanou.
+
+Kategorie:
+A F2 G2
+
+#### SQL
+
+```
+select o.jmeno, g.id_kontrakt, g.odmena
+from (
+    select k.id_kontrakt, k.odmena, z.id_osoba from kontrakt k
+    join zamestnanec z using(id_osoba)
+) as g
+join osoba o using(id_osoba)
+```
+
+### Kolik by probehlo nakupu pokud by si kazdy zamestnanec koupil od kazdeho druhu zbozi alespon 1 kus.
+
+Kategorie:
+F3 I1
+
+#### SQL
+
+```
+select count(*) as pocet_nakupu
+from zbozi
+cross join zakaznik;
+```
+
+### Osoby co nemaji zadny kontrakt a nebydli na zadnem pokoji.
+
+Kategorie:
+G1 H3
+
+#### SQL
+
+```
+select id_osoba
+from zamestnanec
+where id_osoba not in(
+    select id_osoba
+    from kontrakt
+)
+intersect
+select id_osoba
+from zakaznik
+where id_pokoj is null
+```
+
+### Zamestnanci kteri nemaji zadne kontrakty
+
+Kategorie:
+A F2 G1 G4 H2 J
+
+#### SQL
+
+```
+select id_osoba
+from zamestnanec
+where id_osoba not in(
+    select id_osoba
+    from kontrakt
+);
+
+select id_osoba
+from zamestnanec z
+where not exists(
+    select 3
+    from kontrakt k
+    where k.id_osoba = z.id_osoba
+);
+
+select id_osoba
+from zamestnanec
+except
+select id_osoba from zamestnanec join kontrakt using(id_osoba);
+```
+
+### Zmen popis zamestnance s popisem 'Pre-emptive foreground hardware' na popis 'neco' pokud ma tento zamestnanec alespon jeden uspesne splneny kontrakt.
+
+Kategorie:
+G1 O
+
+#### SQL
+
+```
+begin;
+
+select *
+from zamestnanec
+where popis='Pre-emptive foreground hardware';
+
+update zamestnanec
+set popis = 'neco'
+where popis = 'Pre-emptive foreground hardware'
+and id_osoba in (
+select id_osoba
+from kontrakt
+where uspesne_splneno = 'true'
+);
+```
+
+### Vyber osoby ktere nejsou ani zakaznik ani zamestnanec a pridej je do zakazniku.
+
+Kategorie:
+G1 H1 I1 N
+
+#### SQL
+
+```
+begin;
+
+select count(*)
+from osoba
+where id_osoba not in(
+    select id_osoba
+    from zamestnanec
+    union
+    select id_osoba
+    from zakaznik
+);
+
+insert into zakaznik(id_osoba, id_pokoj, vernostni_bonus)
+select id_osoba, null as id_pokoj, 0 as vernostni_bonus
+from osoba
+where id_osoba not in(
+    select id_osoba
+    from zamestnanec
+    union
+    select id_osoba
+    from zakaznik
+);
+
+select count(*)
+from osoba
+where id_osoba not in(
+    select id_osoba
+    from zamestnanec
+    union
+    select id_osoba
+    from zakaznik
+);
+
+rollback;
+```
+
+## Kategorie dotazů
+```
 A 	A - Positive query on at least two joined tables 	D1 D10 D11 D12 D13 D16 D20 D22 D23 D24 D25
 AR 	A (RA) - Positive query on at least two joined tables 	D1 D20 D22 D23 D24 D25
 B 	B - Negative query on at least two joined tables 	D2
@@ -451,3 +623,4 @@ M 	M - Query over a view 	D7
 N 	N - INSERT, which insert a set of rows, which are the result of another subquery (an INSERT command which has VALUES clause replaced by a nested query. 	D18
 O 	O - UPDATE with nested SELECT statement 	D17
 P 	P - DELETE with nested SELECT statement 
+```
