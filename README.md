@@ -589,6 +589,146 @@ where id_osoba not in(
 rollback;
 ```
 
+### Vypis vsechny kontrakty ktere se vazou na typ ukolu prevoz_zbozi a plni je nebo je splnil zamestnanec ktery je starsi nez 20 let.
+
+Kategorie:
+G1
+
+#### SQL
+
+```
+select *
+from kontrakt
+where prevoz_zbozi_id_ukol is not null and id_osoba in(
+    select id_osoba
+    from zamestnanec z
+    where z.vek > 20
+)
+;
+```
+
+### Vypis vsechny nakupy ktere probehly pred 18.3.2035 a zaroven vypis jmeno toho kdo nakupoval.
+
+Kategorie:
+A F1
+
+#### RA
+```
+prodej(datum>'18.3.2077')[prodej.id_osoba = osoba.id_osoba]osoba
+```
+
+#### SQL
+
+```
+SELECT *
+FROM prodej
+JOIN osoba ON prodej.id_osoba = osoba.id_osoba
+WHERE datum > '2077-03-18';
+```
+
+### Ukol typu ostatni ktery nikdo neplni.
+
+Kategorie:
+G1 G4
+
+#### RA
+```
+ostatni!<ostatni.id_ukol=kontrakt.ostatni_id_ukol]kontrakt
+```
+
+#### SQL
+
+```
+select distinct *
+from ostatni o
+where not exists(
+    select *
+    from kontrakt
+    where o.id_ukol = kontrakt.ostatni_id_ukol
+)
+```
+
+### Zbozi ktere si koupil osoba "Vojtech".
+
+Kategorie:
+A F2
+
+#### RA
+
+```
+osoba(jmeno='Vojtech')[osoba.id_osoba=prodej.id_osoba]prodej[prodej.id_zbozi = zbozi.id_zbozi>zbozi```
+```
+
+#### SQL
+
+```sql
+select z.*
+from zbozi z
+join prodej using(id_zbozi)
+join osoba using(id_osoba)
+where jmeno='Vojtech'
+```
+
+### Vsichni zakaznici kteri si rezervuji pokoj. 
+
+Kategorie:
+A F2
+
+#### RA
+
+```
+{zakaznik[zakaznik.id_pokoj = pokoj.id_pokoj]pokoj}[zakaznik.id_pokoj ,zakaznik.id_osoba, zakaznik.vernostni_bonus, pokoj.pocet_postel]
+```
+
+#### SQL
+
+```sql
+select *
+from zakaznik
+join pokoj using(id_pokoj)
+```
+
+### Vsechny osoby ktere jsou zakaznici a zamestnanci zaroven.
+
+Kategorie:
+A F1
+
+#### RA
+
+```
+{zakaznik[zakaznik.id_osoba = zamestnanec.id_osoba]zamestnanec}[zakaznik.id_osoba, zakaznik.vernostni_bonus, zamestnanec.vek, zamestnanec.popis]
+```
+
+#### SQL
+
+```sql
+select z.id_osoba,
+        z.vernostni_bonus,
+        zm.vek,
+        zm.popis
+from zakaznik z
+join zamestnanec zm on zm.id_osoba = z.id_osoba
+```
+
+### Vyber vsechny kontrakty ktere jsou spojene s ukolem typu prevoz zbozi a vyber jenom typ nakladu, hmotnost nakladu, odkud a kam. 
+
+Kategorie:
+A F1
+
+#### RA
+
+```
+{zakaznik[zakaznik.id_osoba = zamestnanec.id_osoba]zamestnanec}[zakaznik.id_osoba, zakaznik.vernostni_bonus, zamestnanec.vek, zamestnanec.popis]
+```
+
+#### SQL
+
+```sql
+select distinct typ_naklad, hmotnost_naklad, odkud, kam
+from kontrakt k
+join prevoz_zbozi pz on k.prevoz_zbozi_id_ukol = pz.id_ukol
+```
+
 ## Kategorie dotazů
 ```
 A 	A - Positive query on at least two joined tables 	D1 D10 D11 D12 D13 D16 D20 D22 D23 D24 D25
